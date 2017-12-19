@@ -9,9 +9,9 @@ Check out the file **examples.ipynb** in order to see usage examples.
 ## Usage
 
 1. Download this repo with `git clone`.
-2. Run the tests to guaranty usability.
+2. Run the tests to guarantee usability.
 3. Install locally. Go to the base directory and run:
-    `pip install -e .`
+    `pip install -e .`.
 
 ## Tests
 

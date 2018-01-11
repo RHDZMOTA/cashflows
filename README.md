@@ -8,7 +8,7 @@ Check out the file **examples.ipynb** in order to see usage examples.
 
 ## Usage
 
-1. Download this repo with `git clone`.
+1. Download this repo with `git clone https://github.com/rhdzmota/cashflows.git`.
 2. Run the tests to guarantee usability.
 3. Install locally. Go to the base directory and run:
     `pip install -e .`.
@@ -18,35 +18,27 @@ Check out the file **examples.ipynb** in order to see usage examples.
 There are two ways of running tests.
 Make sure to have **nose** installed.
 
-#### Linux package 
+#### Nose installation 
+
+There are two ways of installing nose:
+
+* Install the linux package: `sudo apt install python3-nose`
+* Install via pip: `pip install nose`
 In the base directory run the following:
 
-```bash
-sudo apt install python3-nose
-nosetests3
-```
+#### Run the tests
 
-#### Python package
-Use the virtualenv with the required packages.
+Go to the base directory and run the following: 
 
-```bash
-virtualenv venv
-source venv/bin/activate
-pip install -r requirements
-python setup.py test
-```
+* Using the linux package: `nosetests3`
+* Using python: `python setup.py test`
 
-Or via pip.
-
-```bash
-pip install nose
-python setup.py test
-```
 
 ## Contribute
 Contact the main developer.
 
 * **Main developer**: Rodrigo Hernández Mota (rohdzmota@gmail.com)
+* **Developer**: Jose Luis Vazquez ()
 
 ## License
 

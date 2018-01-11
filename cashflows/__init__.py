@@ -1,1 +1,1 @@
-from .flows import FlowConf, CashFlow
+from .flows import Flow, CashFlow

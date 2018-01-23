@@ -9,8 +9,12 @@ Check out the file **examples.ipynb** in order to see usage examples.
 ## Usage
 
 1. Download this repo with `git clone https://github.com/rhdzmota/cashflows.git`.
-2. Run the tests to guarantee usability.
-3. Install locally. Go to the base directory and run:
+1. Create a virtual-environment and install requirements.
+    * `virtualenv --python=python3 venv`
+    * `source venv/bin/activate`
+    * `pip install -r requirements.txt`
+1. Run the tests to guarantee usability (see **Tests** section).
+1. Install locally. Go to the base directory and run:
     `pip install -e .`.
 
 ## Tests
@@ -34,13 +38,12 @@ Go to the base directory and run the following:
 * Using python: `python setup.py test`
 
 
-## Contribute
-Contact the main developer.
+## Contributions and authors
+Contact the main developer for contributions.
 
 * **Main developer**: Rodrigo Hernández Mota (rohdzmota@gmail.com)
-* **Developer**: Jose Luis Vazquez ()
+* **Developer**: Jose Luis Vazquez (--)
 
 ## License
 
 See the LICENSE.md file. 
-

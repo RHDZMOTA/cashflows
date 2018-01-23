@@ -1,10 +1,12 @@
-import warnings
-import numpy as np
 import matplotlib.pyplot as plt
+import numpy as np
+import warnings
 
-from .financial_functions import *
+from datetime import datetime, timedelta
 from dateutil.parser import parse
-from datetime import datetime
+
+from .financial_functions import xnpv, xirr
+
 
 flow_types = ["inflow", "outflow"]  # TODO: externalize this.
 time_types = ["int", "date"]
@@ -193,20 +195,25 @@ class CashFlow(object):
         if self.time_type == "date":
             return xnpv(sorted_flows, rate, year_days=365)
 
-    def plot(self):
+    def plot(self, title="", x_label="", y_label=""):
         sorted_flows = self.get_sorted_flows()
         plt.axhline(y=0)
         if self.time_type == "int":
             plt.bar(x=np.arange(len(sorted_flows)), height=sorted_flows)
         else:
             w = int((sorted_flows[-1].time.value - sorted_flows[0].time.value).days / (2 * len(sorted_flows)))
-            plt.bar(
-                [flow.time.value for flow in self.get_sorted_flows()],
-                [flow.value for flow in self.get_sorted_flows()],
-                width=w, alpha=0.7
-            )
-        plt.title("CashFlow Graphic Representation")
-        plt.ylabel(self.flows[0].currency)
-        plt.xlabel("Time units")
+            x_values = [flow.time.value for flow in sorted_flows]
+            y_values = []
+            for flow in sorted_flows:
+                s = flow.value
+                if flow.type == "outflow":
+                    s *= -1
+                y_values.append(s)
+            plt.bar(x_values, y_values, width=w, alpha=0.7)
+            axes = plt.gca()
+            axes.set_xlim([min(x_values) - timedelta(days=w), max(x_values) + timedelta(days=w)])
+        plt.title("CashFlow Graphic Representation" if not title else title)
+        plt.ylabel(self.flows[0].currency if not y_label else y_label)
+        plt.xlabel("Time units" if not x_label else x_label)
         plt.grid()
         plt.show()

@@ -1,4 +1,3 @@
-import numpy as np
 import scipy.optimize
 
 
@@ -6,7 +5,7 @@ def xnpv(sorted_flows, rate, year_days=360):
     npv = 0
     for flow in sorted_flows:
         year = (flow.time.value - sorted_flows[0].time.value).days / year_days
-        val = flow.value * np.power(1 + rate, -year)
+        val = flow.value * (1 + rate) ** (-year)
         if flow.type == "outflow":
             val *= -1
         npv += val

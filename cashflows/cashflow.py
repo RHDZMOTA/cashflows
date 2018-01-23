@@ -1,116 +1,18 @@
+from datetime import timedelta
+
 import matplotlib.pyplot as plt
 import numpy as np
-import warnings
 
-from datetime import datetime, timedelta
-from dateutil.parser import parse
-
-from .financial_functions import xnpv, xirr
-
-
-flow_types = ["inflow", "outflow"]  # TODO: externalize this.
-time_types = ["int", "date"]
-
-
-class Time(object):
-
-    def __init__(self, value, time_type="date"):
-        self.time_type = self.validate_time_type(time_type)
-        self.value = self.validate_value(value, time_type)
-
-    def __str__(self):
-        return str(self.value)
-
-    def to_string(self):
-        return str(self)
-
-    def __eq__(self, other):
-        if not isinstance(other, Time):
-            return False
-        return other.value == self.value
-
-    def __lt__(self, other):
-        if not isinstance(other, Time):
-            raise ValueError("Cannot perform operation.")
-        return self.value < other.value
-
-    def equals(self, other):
-        return other == self
-
-    @staticmethod
-    def validate_time_type(time_type):
-        if time_type not in time_types:
-            raise ValueError("Invalid time_type.")
-        return time_type
-
-    @staticmethod
-    def validate_value(value, time_type):
-        if time_type == "int":
-            if not isinstance(value, int):
-                warnings.warn("Time value must be integer, casting was applied to fix this.")
-                value = int(value)
-            return value
-        if time_type == "date":
-            if isinstance(value, str):
-                value = parse(value)
-            if isinstance(value, datetime):
-                return value
-        raise ValueError("Value parameter is not a valid type.")
-
-
-class Flow(object):
-    def __init__(self, flow_type, value, time, time_type="int", currency="mxn"):
-        self.type = self.validate_flow_type(flow_type)
-        self.time = Time(time, time_type)
-        self.value = self.validate_value(value)
-        self.currency = self.validate_currency(currency)
-
-    def __str__(self):
-        return "Flow(type: {this_type}, time: {this_time}, value: {this_value}, currency: {this_currency})".format(
-            this_type=self.type,
-            this_time=self.time.to_string(),
-            this_value=self.value,
-            this_currency=self.currency
-        )
-
-    def to_string(self):
-        return str(self)
-
-    def combine(self, flow_conf):
-        if not isinstance(flow_conf, Flow):
-            raise ValueError('flow_conf param is not an instance of FlowConf.')
-        if not flow_conf.time.equals(self.time):
-            raise ValueError('flow_conf param is not in the same time.')
-        if not flow_conf.currency == self.currency:
-            raise ValueError('flow_conf param is not in the same currency.')
-        adjustment = 1 if self.type == flow_conf.type else -1
-        new_val = self.value + adjustment * flow_conf.value
-        self.type = self.type if new_val > 0 else flow_conf.type
-        self.value = np.abs(new_val)
-
-    @staticmethod
-    def validate_flow_type(flow_type):
-        if not isinstance(flow_type, str):
-            raise ValueError('String value expected.')
-        if flow_type not in flow_types:
-            raise ValueError('flow_type parameter must be a valid type.')
-        return flow_type
-
-    @staticmethod
-    def validate_value(value):
-        value = float(value)
-        return value
-
-    @staticmethod
-    def validate_currency(currency):
-        # TODO: add validation
-        return currency
+from .flow import Flow
+from .settings import FLOW_TYPES, DEFAULT_CURRENCY
+from .util.financial_functions import xnpv, xirr
 
 
 class CashFlow(object):
 
-    def __init__(self, time_type, annual_factor=None):
+    def __init__(self, time_type, annual_factor=None, currency=DEFAULT_CURRENCY):
         self.annual_factor = annual_factor if annual_factor else 1
+        self.currency = currency
         self.time_type = time_type
         self.max_time = None
         self.flows = []
@@ -141,17 +43,17 @@ class CashFlow(object):
         if new_flow.time > self.max_time:
             self.max_time = new_flow.time
 
-    def add(self, flow_type, value, time, currency="mxn"):
+    def add(self, flow_type, value, time, currency=DEFAULT_CURRENCY):
         self.add_flow_obj(Flow(flow_type, value, time, self.time_type, currency))
 
-    def add_inflow(self, value, time, currency="mxn"):
+    def add_inflow(self, value, time, currency=DEFAULT_CURRENCY):
         self.add_flow_obj(Flow("inflow", value, time, self.time_type, currency))
 
-    def add_outflow(self, value, time, currency="mxn"):
+    def add_outflow(self, value, time, currency=DEFAULT_CURRENCY):
         self.add_flow_obj(Flow("outflow", value, time, self.time_type, currency))
 
     def _query_flow_type(self, flow_type, attr):
-        if flow_type not in flow_types:
+        if flow_type not in FLOW_TYPES:
             raise ValueError('flow_type not available.')
         return [getattr(flow, attr) for flow in self.flows if flow.type == flow_type]
 

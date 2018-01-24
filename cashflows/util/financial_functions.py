@@ -6,8 +6,6 @@ def xnpv(sorted_flows, rate, year_days=360):
     for flow in sorted_flows:
         year = (flow.time.value - sorted_flows[0].time.value).days / year_days
         val = flow.value * (1 + rate) ** (-year)
-        if flow.type == "outflow":
-            val *= -1
         npv += val
     return npv
 

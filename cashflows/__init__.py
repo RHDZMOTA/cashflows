@@ -1,2 +1,2 @@
-from .flow import Flow
 from .cashflow import CashFlow
+from .cashflowstream import CashFlowStream

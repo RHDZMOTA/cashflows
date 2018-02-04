@@ -3,7 +3,7 @@ import warnings
 from datetime import datetime
 from dateutil.parser import parse
 
-from ..settings import TIME_TYPES
+from cashflows.settings import TIME_TYPES
 
 
 class Time(object):

@@ -54,6 +54,9 @@ class CashFlow(object):
             return new_cash_flow
         self.value = new_val
 
+    def neg(self):
+        return self.scale(rate=-1)
+
     def scale(self, rate, inplace=False):
         new_val = rate * self.value
         if not inplace:

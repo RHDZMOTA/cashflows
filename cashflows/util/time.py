@@ -1,12 +1,13 @@
 import warnings
 
 from datetime import datetime
-from dateutil.parser import parse
 
 from cashflows.settings import TIME_TYPES
 
 
 class Time(object):
+
+    DATETIME_FORMAT = "%Y-%m-%d"
 
     def __init__(self, value, time_type="date"):
         self.time_type = self.validate_time_type(time_type)
@@ -46,7 +47,7 @@ class Time(object):
             return value
         if time_type == "date":
             if isinstance(value, str):
-                value = parse(value)
+                value = datetime.strptime(value, Time.DATETIME_FORMAT)
             if isinstance(value, datetime):
                 return value
         raise ValueError("Value parameter is not a valid type.")

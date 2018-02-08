@@ -13,7 +13,7 @@ from .util.financial_functions import xnpv, xirr
 
 class CashFlowStream(object):
 
-    def __init__(self, time_type, annual_factor=None, currency=DEFAULT_CURRENCY):
+    def __init__(self, time_type, annual_factor=None, name="", currency=DEFAULT_CURRENCY):
         """Create an stream of cashflow objects and perform financial operations over it.
 
         :param time_type: [string] whether the stream will contain CashFlow object with time_type "int" or "date".
@@ -27,6 +27,7 @@ class CashFlowStream(object):
         self.time_type = time_type
         self.max_time = None
         self.flows = []
+        self.name = name
 
     def __str__(self):
         return "{\n\t" + "\n\t".join([str(flow) for flow in self.flows]) + "\n}"
@@ -87,13 +88,17 @@ class CashFlowStream(object):
     def diff(self, other, inplace=False):
         return self.add(other=other.neg(), inplace=inplace)
 
-    def random_initialization(self, n, time_range, value_range, out_prob=0.7):
+    def random_initialization(self, n, time_range, value_range, out_prob=0.7, inplace=True):
+        other = self.clone()
         for i in range(n):
             time = randint(time_range[0], time_range[-1])
             value = randint(value_range[0], value_range[-1])
             if rand() < out_prob:
                 value *= -1
-            self.put(value=value, time=time, currency=self.currency)
+            other.put(value=value, time=time, currency=self.currency)
+        if not inplace:
+            return other
+        self.flows = other.flows
 
     def _purge(self):
         new_flows = []
@@ -143,7 +148,7 @@ class CashFlowStream(object):
             raise ValueError('flow_type not available.')
         return [getattr(flow, attr) for flow in self.flows if flow.get_type() == flow_type]
 
-    def get_profitability(self):
+    def get_cash_on_cash_multiple(self):
         if not self.flows:
             raise ValueError('No flows registered.')
         inflow = sum(self._query_flow_type(flow_type=FLOW_TYPES.get("inflow"), attr="value"))
@@ -175,7 +180,10 @@ class CashFlowStream(object):
     def get_npv(self, rate):
         sorted_flows = self.get_sorted_flows()
         if self.time_type == "int":
-            return npv(rate, sorted_flows)
+            flows_with_zeros = zeros(self.max_time.value + 1)
+            for flow in sorted_flows:
+                flows_with_zeros[flow.time.value] = flow.value
+            return npv(rate, flows_with_zeros)
         if self.time_type == "date":
             return xnpv(sorted_flows, rate, year_days=365)
 
@@ -183,7 +191,10 @@ class CashFlowStream(object):
         sorted_flows = self.get_sorted_flows()
         plt.axhline(y=0)
         if self.time_type == "int":
-            plt.bar(x=arange(len(sorted_flows)), height=sorted_flows)
+            flows_with_zeros = zeros(self.max_time.value + 1)
+            for flow in sorted_flows:
+                flows_with_zeros[flow.time.value] = flow.value
+            plt.bar(x=arange(len(flows_with_zeros)), height=flows_with_zeros)
         else:
             w = int((sorted_flows[-1].time.value - sorted_flows[0].time.value).days / (2 * len(sorted_flows)))
             x_values = [flow.time.value for flow in sorted_flows]

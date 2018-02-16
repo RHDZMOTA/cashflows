@@ -72,13 +72,13 @@ class TestFlows(TestCase):
         result = a.scale(r + s) == a.scale(r).add(a.scale(s))
         self.assertTrue(result)
 
-    def test_profitability(self):
+    def test_get_cash_on_cash_multiple(self):
         a = CashFlowStream(time_type="int")
         a.put(value=-100, time=0)
         a.put(value=50, time=2)
         a.put(value=80, time=4)
         a.put(value=-10, time=4)
-        result = a.get_profitability() == 1.2
+        result = a.get_cash_on_cash_multiple() == 1.2
         self.assertTrue(result)
 
     def test_irr(self):
